@@ -21,5 +21,3 @@ class FCDiscriminator(nn.Module):
 		x = self.leaky_relu(x)
 		x = self.classifier(x)
 		return x
-
-

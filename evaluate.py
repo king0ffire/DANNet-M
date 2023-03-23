@@ -41,14 +41,16 @@ def main():
     if args.model == 'RefineNet':
         model = RefineNet(num_classes=args.num_classes, imagenet=False)
 
-    saved_state_dict = torch.load(args.restore_from)
+    #saved_state_dict = torch.load(args.restore_from)
+    saved_state_dict = torch.load(args.restore_from,map_location=lambda storage, loc: storage)
     model_dict = model.state_dict()
     saved_state_dict = {k: v for k, v in saved_state_dict.items() if k in model_dict}
     model_dict.update(saved_state_dict)
     model.load_state_dict(saved_state_dict)
 
     lightnet = LightNet()
-    saved_state_dict = torch.load(args.restore_from_light)
+    #saved_state_dict = torch.load(args.restore_from_light)
+    saved_state_dict = torch.load(args.restore_from_light,map_location=lambda storage, loc: storage)
     model_dict = lightnet.state_dict()
     saved_state_dict = {k: v for k, v in saved_state_dict.items() if k in model_dict}
     model_dict.update(saved_state_dict)
@@ -62,10 +64,7 @@ def main():
     testloader = data.DataLoader(zurich_night_DataSet(args.data_dir, args.data_list, set=args.set))
     interp = nn.Upsample(size=(1080, 1920), mode='bilinear', align_corners=True)
 
-    weights = torch.log(torch.FloatTensor(
-        [0.36869696, 0.06084986, 0.22824049, 0.00655399, 0.00877272, 0.01227341, 0.00207795, 0.0055127, 0.15928651,
-         0.01157818, 0.04018982, 0.01218957, 0.00135122, 0.06994545, 0.00267456, 0.00235192, 0.00232904, 0.00098658,
-         0.00413907])).cuda()
+    weights = torch.log(torch.FloatTensor([0.36869696, 0.06084986, 0.22824049, 0.00655399, 0.00877272, 0.01227341, 0.00207795, 0.0055127, 0.15928651, 0.01157818, 0.04018982, 0.01218957, 0.00135122, 0.06994545, 0.00267456, 0.00235192, 0.00232904, 0.00098658, 0.00413907])).cuda() #19个category的proportion
     weights = (torch.mean(weights) - weights) / torch.std(weights) * args.std + 1.0
 
     for index, batch in enumerate(testloader):

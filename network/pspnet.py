@@ -129,15 +129,15 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        x = self.relu1(self.bn1(self.conv1(x)))
+        x = self.relu1(self.bn1(self.conv1(x))) # stride2图像尺寸缩小0.5
         x = self.relu2(self.bn2(self.conv2(x)))
         x = self.relu3(self.bn3(self.conv3(x)))
-        x = self.maxpool(x)
+        x = self.maxpool(x) #(,256,256)to(,129,129)
         x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
+        x = self.layer2(x)#to(512,65,65)
+        x = self.layer3(x)#to(1024,65,65)
         x_dsn = self.dsn(x)
-        x = self.layer4(x)
+        x = self.layer4(x)#to(2048,65,65)
         x = self.head(x)
         return x_dsn, x
 
